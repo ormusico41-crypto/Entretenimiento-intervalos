@@ -1,0 +1,815 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { Play, BookOpen, Music, Check, X, Volume2, RefreshCw, Trophy, ArrowUp, ArrowDown, Globe, Sparkles, Layers, Activity } from 'lucide-react';
+
+// --- ICONOS MUSICALES PERSONALIZADOS (SVGs) ---
+
+const TrebleClef = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M9 18V5l12-2v13" style={{opacity: 0}} />
+    <path d="M10.7 18.8c.6.4 1.4.2 1.8-.4.5-.7.2-1.8-.6-2.2-.8-.4-1.7.2-1.7 1.1 0 .9.8 1.5 1.7 1.1z" />
+    <path d="M12.2 16.2c-2.3-1.3-3-4.3-1.5-6.6 1.1-1.8 3.5-2.2 4.9-.8 1.3 1.3.8 3.6-.8 4.6-1.5 1-3.3.4-3.7-1.4-.4-1.7.9-3.3 2.6-3.4 1.5-.1 2.8 1.1 2.8 2.6v9.3c0 1.9-1.6 3.5-3.5 3.5-1.5 0-2.8-1-3.3-2.4" />
+  </svg>
+);
+
+const BassClef = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M6 6c0 5 4 9 9 9s9-4 9-9" style={{opacity: 0}} /> 
+    <path d="M15.5 15.5c-2.8 0-5-2.2-5-5s2.2-5 5-5c2.3 0 4.2 1.5 4.8 3.6" />
+    <circle cx="15.5" cy="5.5" r="1.5" fill="currentColor" />
+    <circle cx="6" cy="7" r="1" fill="currentColor" />
+    <circle cx="6" cy="11" r="1" fill="currentColor" />
+  </svg>
+);
+
+const QuarterNote = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="9" cy="18" r="3.5" fill="currentColor" />
+    <path d="M12.5 18V5" />
+  </svg>
+);
+
+const BeamedNotes = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="6" cy="18" r="3" fill="currentColor" />
+    <circle cx="18" cy="16" r="3" fill="currentColor" />
+    <path d="M9 18V5l12-2v13" />
+  </svg>
+);
+
+const StaffLines = ({ className }) => (
+  <svg viewBox="0 0 100 40" fill="none" stroke="currentColor" strokeWidth="0.5" className={className} preserveAspectRatio="none">
+    <path d="M0 10h100M0 15h100M0 20h100M0 25h100M0 30h100" />
+  </svg>
+);
+
+// Componente para ejemplos visuales de tipos de intervalos
+const IntervalExampleVisual = ({ type, isPlaying }) => {
+  return (
+    <div className="relative w-full h-20 bg-white rounded-lg border border-gray-100 flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 flex flex-col justify-center opacity-30 pointer-events-none">
+        <StaffLines className="w-full text-gray-800" />
+      </div>
+      
+      <svg viewBox="0 0 100 40" className="w-full h-full absolute inset-0 text-indigo-900 pointer-events-none">
+        {/* Clave de Sol estática */}
+        <path d="M15 32 C 12 32, 10 28, 12 24 C 14 20, 18 20, 18 16 C 18 13, 16 11, 15 13 C 13 16, 12 25, 15 35" fill="none" stroke="currentColor" strokeWidth="0.5" opacity="0.5" />
+        
+        {type === 'asc' && (
+          <>
+            <line x1="25" y1="35" x2="35" y2="35" stroke="currentColor" strokeWidth="0.5" />
+            <circle cx="30" cy="35" r="2.5" fill={isPlaying ? "#4ade80" : "currentColor"} className="transition-colors duration-300" />
+            <line x1="32.5" y1="35" x2="32.5" y2="15" stroke="currentColor" strokeWidth="0.5" />
+            <circle cx="50" cy="25" r="2.5" fill={isPlaying ? "#4ade80" : "currentColor"} className={`transition-colors duration-300 ${isPlaying ? 'delay-500' : ''}`} />
+            <line x1="52.5" y1="25" x2="52.5" y2="5" stroke="currentColor" strokeWidth="0.5" />
+            <path d="M 35 30 Q 40 20 45 28" fill="none" stroke="#6366f1" strokeWidth="0.5" strokeDasharray="2 1" markerEnd="url(#arrowhead)" opacity="0.6"/>
+          </>
+        )}
+
+        {type === 'desc' && (
+          <>
+            <circle cx="30" cy="25" r="2.5" fill={isPlaying ? "#facc15" : "currentColor"} className="transition-colors duration-300" />
+            <line x1="32.5" y1="25" x2="32.5" y2="5" stroke="currentColor" strokeWidth="0.5" />
+            <line x1="45" y1="35" x2="55" y2="35" stroke="currentColor" strokeWidth="0.5" />
+            <circle cx="50" cy="35" r="2.5" fill={isPlaying ? "#facc15" : "currentColor"} className={`transition-colors duration-300 ${isPlaying ? 'delay-500' : ''}`} />
+            <line x1="52.5" y1="35" x2="52.5" y2="15" stroke="currentColor" strokeWidth="0.5" />
+             <path d="M 35 28 Q 40 38 45 30" fill="none" stroke="#f59e0b" strokeWidth="0.5" strokeDasharray="2 1" opacity="0.6"/>
+          </>
+        )}
+
+        {type === 'harm' && (
+          <>
+            <line x1="35" y1="35" x2="45" y2="35" stroke="currentColor" strokeWidth="0.5" />
+            <circle cx="40" cy="35" r="2.5" fill={isPlaying ? "#a855f7" : "currentColor"} className="transition-colors duration-300" />
+            <line x1="42.5" y1="35" x2="42.5" y2="15" stroke="currentColor" strokeWidth="0.5" />
+            <circle cx="40" cy="25" r="2.5" fill={isPlaying ? "#a855f7" : "currentColor"} className="transition-colors duration-300" />
+            <line x1="42.5" y1="25" x2="42.5" y2="5" stroke="currentColor" strokeWidth="0.5" />
+          </>
+        )}
+      </svg>
+    </div>
+  );
+};
+
+// --- TEXTOS E IDIOMAS ---
+
+const TRANSLATIONS = {
+  es: {
+    title: 'Intervalos',
+    subtitle: 'Laboratorio Sonoro',
+    description: 'Herramienta pedagógica para el desarrollo del oído musical.',
+    instructionBtn: 'Zona de Instrucción',
+    typesBtn: 'Tipos de Intervalos',
+    trainingBtn: 'Zona de Entrenamiento',
+    footer: 'Diseñado para el programa de Música | Prof. Orlando Gómez',
+    learnTitle: 'Guía de Intervalos',
+    typesTitle: 'Tipos de Movimiento',
+    back: 'Volver',
+    listen: 'Escuchar',
+    semitones: 'ST',
+    tones: 'T',
+    exit: 'Salir',
+    score: 'Aciertos',
+    attempts: 'Intentos',
+    difficulty: 'Dificultad',
+    levelBasic: 'Nivel Básico',
+    levelChromatic: 'Nivel Cromático',
+    playing: 'Reproduciendo...',
+    touchToRepeat: 'Repetir',
+    correct: '¡Excelente!',
+    incorrect: 'Ups, intenta de nuevo',
+    isA: 'Es una',
+    listenPrompt: '¿Qué intervalo escuchas?',
+    start: 'Comenzar',
+    next: 'Siguiente',
+    direction: 'Dirección',
+    ascName: 'Ascendente',
+    descName: 'Descendente',
+    harmName: 'Armónico',
+    ascDef: 'Notas consecutivas, de grave a agudo (subiendo). Sensación de apertura.',
+    descDef: 'Notas consecutivas, de agudo a grave (bajando). Sensación de cierre.',
+    harmDef: 'Notas simultáneas. Crea la textura y el "color" vertical del acorde.',
+  },
+  en: {
+    title: 'Intervals',
+    subtitle: 'Sound Laboratory',
+    description: 'Pedagogical tool for ear training development.',
+    instructionBtn: 'Instruction Zone',
+    typesBtn: 'Interval Types',
+    trainingBtn: 'Training Zone',
+    footer: 'Designed for the Music Program | Prof. Orlando Gómez',
+    learnTitle: 'Interval Guide',
+    typesTitle: 'Types of Motion',
+    back: 'Back',
+    listen: 'Listen',
+    semitones: 'ST',
+    tones: 'T',
+    exit: 'Exit',
+    score: 'Score',
+    attempts: 'Attempts',
+    difficulty: 'Difficulty',
+    levelBasic: 'Basic Level',
+    levelChromatic: 'Chromatic Level',
+    playing: 'Playing...',
+    touchToRepeat: 'Repeat',
+    correct: 'Excellent!',
+    incorrect: 'Oops, try again',
+    isA: 'It is a',
+    listenPrompt: 'Which interval is this?',
+    start: 'Start',
+    next: 'Next',
+    direction: 'Direction',
+    ascName: 'Ascending',
+    descName: 'Descending',
+    harmName: 'Harmonic',
+    ascDef: 'Consecutive notes, low to high. Sense of opening.',
+    descDef: 'Consecutive notes, high to low. Sense of closure.',
+    harmDef: 'Simultaneous notes. Vertical texture and chord color.',
+  }
+};
+
+const INTERVALS = [
+  { 
+    semitones: 0, tones: '0', short: 'P1',
+    colorTheme: 'gray', 
+    name: { es: 'Unísono Justo', en: 'Perfect Unison' },
+    desc: { es: 'La misma nota repetida.', en: 'The same note repeated.' },
+    songs: { asc: { es: 'Jingle Bells (Ritmo)', en: 'Jingle Bells (Rhythm)' }, desc: { es: 'Happy Birthday (Inicio)', en: 'Happy Birthday (Start)' } }
+  },
+  { 
+    semitones: 1, tones: '0.5', short: 'm2', 
+    colorTheme: 'rose', 
+    name: { es: '2da Menor', en: 'Minor 2nd' },
+    desc: { es: 'Disonante, tenso.', en: 'Dissonant, tense.' },
+    songs: { asc: { es: 'Tiburón (Jaws)', en: 'Jaws (Theme)' }, desc: { es: 'Para Elisa (Fur Elise)', en: 'Fur Elise' } }
+  },
+  { 
+    semitones: 2, tones: '1', short: 'M2', 
+    colorTheme: 'orange', 
+    name: { es: '2da Mayor', en: 'Major 2nd' },
+    desc: { es: 'Paso entero, escalas.', en: 'Whole step, major scales.' },
+    songs: { asc: { es: 'Cumpleaños Feliz', en: 'Happy Birthday' }, desc: { es: 'Yesterday (The Beatles)', en: 'Yesterday (The Beatles)' } }
+  },
+  { 
+    semitones: 3, tones: '1.5', short: 'm3', 
+    colorTheme: 'amber', 
+    name: { es: '3ra Menor', en: 'Minor 3rd' },
+    desc: { es: 'Triste, melancólico.', en: 'Sad, melancholic.' },
+    songs: { asc: { es: 'Seven Nation Army', en: 'Seven Nation Army' }, desc: { es: 'Hey Jude (The Beatles)', en: 'Hey Jude (The Beatles)' } }
+  },
+  { 
+    semitones: 4, tones: '2', short: 'M3', 
+    colorTheme: 'lime', 
+    name: { es: '3ra Mayor', en: 'Major 3rd' },
+    desc: { es: 'Brillante, alegre.', en: 'Bright, happy.' },
+    songs: { asc: { es: 'When the Saints', en: 'When the Saints' }, desc: { es: '5ta Sinfonía Beethoven', en: 'Beethoven\'s 5th' } }
+  },
+  { 
+    semitones: 5, tones: '2.5', short: 'P4', 
+    colorTheme: 'emerald', 
+    name: { es: '4ta Justa', en: 'Perfect 4th' },
+    desc: { es: 'Estable, solemne.', en: 'Stable, solemn.' },
+    songs: { asc: { es: 'Amazing Grace', en: 'Amazing Grace' }, desc: { es: 'Pequeña Serenata (Mozart)', en: 'Eine Kleine Nachtmusik' } }
+  },
+  { 
+    semitones: 6, tones: '3', short: 'TT', 
+    colorTheme: 'fuchsia', 
+    name: { es: 'Tritono', en: 'Tritone' }, 
+    desc: { es: 'Disonancia máxima.', en: 'Max dissonance.' },
+    songs: { asc: { es: 'Los Simpson (Intro)', en: 'The Simpsons (Intro)' }, desc: { es: 'Black Sabbath (Riff)', en: 'Black Sabbath (Riff)' } }
+  },
+  { 
+    semitones: 7, tones: '3.5', short: 'P5', 
+    colorTheme: 'sky', 
+    name: { es: '5ta Justa', en: 'Perfect 5th' },
+    desc: { es: 'Muy estable, poderosa.', en: 'Very stable, powerful.' },
+    songs: { asc: { es: 'Star Wars (Tema)', en: 'Star Wars (Main Theme)' }, desc: { es: 'Los Picapiedra', en: 'The Flintstones' } }
+  },
+  { 
+    semitones: 8, tones: '4', short: 'm6', 
+    colorTheme: 'indigo', 
+    name: { es: '6ta Menor', en: 'Minor 6th' },
+    desc: { es: 'Romántica, dramática.', en: 'Romantic, dramatic.' },
+    songs: { asc: { es: 'The Entertainer', en: 'The Entertainer' }, desc: { es: 'Love Story (Tema)', en: 'Love Story (Theme)' } }
+  },
+  { 
+    semitones: 9, tones: '4.5', short: 'M6', 
+    colorTheme: 'violet', 
+    name: { es: '6ta Mayor', en: 'Major 6th' },
+    desc: { es: 'Dulce, pastoral.', en: 'Sweet, pastoral.' },
+    songs: { asc: { es: 'My Way (Frank Sinatra)', en: 'My Way (Frank Sinatra)' }, desc: { es: 'Music of the Night', en: 'Music of the Night' } }
+  },
+  { 
+    semitones: 10, tones: '5', short: 'm7', 
+    colorTheme: 'purple', 
+    name: { es: '7ma Menor', en: 'Minor 7th' },
+    desc: { es: 'Bluesy, tensión suave.', en: 'Bluesy, soft tension.' },
+    songs: { asc: { es: 'The Winner Takes It All', en: 'The Winner Takes It All' }, desc: { es: 'Watermelon Man', en: 'Watermelon Man' } }
+  },
+  { 
+    semitones: 11, tones: '5.5', short: 'M7', 
+    colorTheme: 'pink', 
+    name: { es: '7ma Mayor', en: 'Major 7th' },
+    desc: { es: 'Disonante, jazz.', en: 'Dissonant, jazzy.' },
+    songs: { asc: { es: 'Take on Me (Coro)', en: 'Take on Me (Chorus)' }, desc: { es: 'I Love You (Cole Porter)', en: 'I Love You (Cole Porter)' } }
+  },
+  { 
+    semitones: 12, tones: '6', short: 'P8', 
+    colorTheme: 'slate', 
+    name: { es: '8va Justa', en: 'Perfect 8ve' },
+    desc: { es: 'Misma nota, más aguda.', en: 'Same note, higher pitch.' },
+    songs: { asc: { es: 'Somewhere Over Rainbow', en: 'Somewhere Over Rainbow' }, desc: { es: 'Willow Weep for Me', en: 'Willow Weep for Me' } }
+  },
+];
+
+const BASE_FREQ = 261.63; 
+
+export default function App() {
+  const [view, setView] = useState('home'); 
+  const [lang, setLang] = useState('es'); 
+  const [audioContext, setAudioContext] = useState(null);
+  
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [score, setScore] = useState(0);
+  const [attempts, setAttempts] = useState(0);
+  const [feedback, setFeedback] = useState(null); 
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedDifficulty, setSelectedDifficulty] = useState('easy'); 
+  const [playingTypeExample, setPlayingTypeExample] = useState(null); 
+
+  const t = TRANSLATIONS[lang]; 
+
+  const initAudio = () => {
+    if (!audioContext) {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      setAudioContext(ctx);
+    }
+  };
+
+  const playTone = (freq, startTime, duration = 0.6, type = 'triangle') => {
+    if (!audioContext) return;
+    const osc = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    osc.type = type;
+    osc.frequency.value = freq;
+    
+    gainNode.gain.setValueAtTime(0, startTime);
+    gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+    
+    osc.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    osc.start(startTime);
+    osc.stop(startTime + duration);
+  };
+
+  const playWinSound = () => {
+    if (!audioContext) return;
+    const now = audioContext.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, i) => {
+        playTone(freq, now + (i * 0.08), 0.3, 'sine');
+    });
+  };
+
+  const playInterval = (baseFreq, semitones, mode = 'melodic', direction = 'asc') => {
+    if (!audioContext) return;
+    initAudio();
+
+    const now = audioContext.currentTime;
+    const intervalRatio = Math.pow(2, semitones / 12);
+    const lowerNote = baseFreq;
+    const higherNote = baseFreq * intervalRatio;
+
+    let firstNote, secondNote;
+    if (direction === 'asc') {
+        firstNote = lowerNote;
+        secondNote = higherNote;
+    } else {
+        firstNote = higherNote;
+        secondNote = lowerNote;
+    }
+
+    setIsPlaying(true);
+
+    if (mode === 'melodic') {
+      playTone(firstNote, now);
+      playTone(secondNote, now + 0.6);
+      setTimeout(() => setIsPlaying(false), 1200);
+    } else {
+      playTone(lowerNote, now, 1.0);
+      playTone(higherNote, now, 1.0);
+      setTimeout(() => setIsPlaying(false), 1000);
+    }
+  };
+
+  const playTypeExample = (type) => {
+    if (!audioContext) initAudio();
+    setPlayingTypeExample(type);
+    if (type === 'asc') playInterval(BASE_FREQ, 7, 'melodic', 'asc');
+    else if (type === 'desc') playInterval(BASE_FREQ, 7, 'melodic', 'desc');
+    else if (type === 'harm') playInterval(BASE_FREQ, 7, 'harmonic', 'asc');
+    setTimeout(() => setPlayingTypeExample(null), 1200);
+  };
+
+  const generateQuestion = () => {
+    setFeedback(null);
+    const difficultySet = selectedDifficulty === 'easy' 
+      ? INTERVALS.filter(i => [0, 4, 5, 7, 12].includes(i.semitones)) 
+      : INTERVALS;
+
+    const randomInterval = difficultySet[Math.floor(Math.random() * difficultySet.length)];
+    const randomSemitoneOffset = Math.floor(Math.random() * 24) - 12; 
+    const baseFreq = BASE_FREQ * Math.pow(2, randomSemitoneOffset / 12);
+    const direction = Math.random() < 0.5 ? 'asc' : 'desc';
+
+    const question = {
+      interval: randomInterval,
+      baseFreq: baseFreq,
+      direction: direction
+    };
+    
+    setCurrentQuestion(question);
+    
+    setTimeout(() => {
+        playInterval(question.baseFreq, question.interval.semitones, 'melodic', question.direction);
+    }, 500);
+  };
+
+  const handleGuess = (interval) => {
+    if (!currentQuestion) return;
+    setAttempts(attempts + 1);
+
+    if (interval.semitones === currentQuestion.interval.semitones) {
+      setScore(score + 1);
+      setFeedback('correct');
+      playWinSound();
+    } else {
+      setFeedback('incorrect');
+    }
+  };
+
+  // --- VISTAS ---
+
+  const HomeView = () => (
+    <div className="flex flex-col items-center justify-center h-full text-center space-y-6 p-4 animate-fade-in relative overflow-hidden">
+      {/* Fondo Decorativo Sutil */}
+      <div className="absolute inset-0 pointer-events-none opacity-5">
+        <StaffLines className="absolute top-10 left-0 w-full text-indigo-900" />
+        <StaffLines className="absolute bottom-10 left-0 w-full text-indigo-900" />
+        <TrebleClef className="absolute top-20 left-10 w-32 h-32 text-indigo-800" />
+        <BassClef className="absolute bottom-20 right-10 w-32 h-32 text-indigo-800" />
+      </div>
+
+      <div className="absolute top-0 left-0 p-4 z-10">
+        <span className="font-serif italic text-lg text-indigo-700 font-bold tracking-wide">
+          El rincón del profe Orlando
+        </span>
+      </div>
+
+      <div className="absolute top-0 right-0 p-4 z-10">
+        <div className="bg-white rounded-full p-1 shadow-sm border border-gray-200 flex items-center">
+            <button 
+                onClick={() => setLang('es')}
+                className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${lang === 'es' ? 'bg-indigo-600 text-white shadow' : 'text-gray-500 hover:text-indigo-600'}`}
+            >
+                ES
+            </button>
+            <button 
+                onClick={() => setLang('en')}
+                className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${lang === 'en' ? 'bg-indigo-600 text-white shadow' : 'text-gray-500 hover:text-indigo-600'}`}
+            >
+                EN
+            </button>
+        </div>
+      </div>
+
+      <div className="bg-indigo-100 p-6 rounded-full shadow-lg mt-8 relative z-10">
+        <Music size={56} className="text-indigo-600" />
+      </div>
+      <div className="relative z-10">
+        <h1 className="text-3xl font-bold text-gray-800 mb-1">{t.title}</h1>
+        <p className="text-xl text-indigo-600 font-medium">{t.subtitle}</p>
+        <p className="text-gray-500 mt-2 max-w-md mx-auto text-sm">
+          {t.description}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 w-full max-w-3xl relative z-10">
+        <button 
+          onClick={() => { initAudio(); setView('types'); }}
+          className="flex items-center justify-center space-x-2 p-3 bg-white border-2 border-indigo-200 rounded-xl hover:bg-indigo-50 hover:border-indigo-400 transition-all shadow-sm group"
+        >
+          <Layers className="text-indigo-500 group-hover:scale-110 transition-transform" />
+          <span className="font-semibold text-gray-700">{t.typesBtn}</span>
+        </button>
+
+        <button 
+          onClick={() => { initAudio(); setView('learn'); }}
+          className="flex items-center justify-center space-x-2 p-3 bg-white border-2 border-indigo-200 rounded-xl hover:bg-indigo-50 hover:border-indigo-400 transition-all shadow-sm group"
+        >
+          <BookOpen className="text-indigo-500 group-hover:scale-110 transition-transform" />
+          <span className="font-semibold text-gray-700">{t.instructionBtn}</span>
+        </button>
+
+        <button 
+          onClick={() => { initAudio(); setView('train'); generateQuestion(); }}
+          className="flex items-center justify-center space-x-2 p-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-md group md:col-span-2 lg:col-span-1"
+        >
+          <Trophy className="text-indigo-200 group-hover:scale-110 transition-transform" />
+          <span className="font-semibold">{t.trainingBtn}</span>
+        </button>
+      </div>
+      
+      <div className="mt-6 text-xs text-gray-400 relative z-10">
+        {t.footer}
+      </div>
+    </div>
+  );
+
+  const TypesView = () => (
+      <div className="flex flex-col h-full p-4 justify-center max-w-6xl mx-auto animate-fade-in overflow-hidden">
+        <div className="flex items-center justify-between mb-4 flex-shrink-0">
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+                <Layers className="mr-3 text-indigo-600" />
+                {t.typesTitle}
+            </h2>
+            <button onClick={() => setView('home')} className="text-gray-500 hover:text-indigo-600 underline text-sm">
+                {t.back}
+            </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 items-center">
+            {/* Tarjeta Ascendente */}
+            <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden h-fit">
+                 <div className="absolute -bottom-4 -right-4 text-sky-200 opacity-20 pointer-events-none transform -rotate-12">
+                   <ArrowUp className="w-32 h-32" />
+                </div>
+                <div className="relative z-10">
+                    <div className="flex items-center space-x-2 mb-3">
+                        <span className="bg-sky-200 text-sky-800 p-1.5 rounded-lg"><ArrowUp size={20}/></span>
+                        <h3 className="text-lg font-bold text-sky-900">{t.ascName}</h3>
+                    </div>
+                    <div className="mb-3">
+                         <IntervalExampleVisual type="asc" isPlaying={playingTypeExample === 'asc'} />
+                    </div>
+                    <p className="text-sky-800 mb-4 text-sm leading-tight min-h-[40px]">
+                        {t.ascDef}
+                    </p>
+                    <button 
+                        onClick={() => playTypeExample('asc')}
+                        className="w-full bg-white hover:bg-sky-100 text-sky-700 font-semibold py-2 rounded-lg border border-sky-200 flex items-center justify-center space-x-2 transition-colors shadow-sm text-sm"
+                    >
+                        <Volume2 size={18} />
+                        <span>{t.listen}</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Tarjeta Descendente */}
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden h-fit">
+                <div className="absolute -bottom-4 -right-4 text-orange-200 opacity-20 pointer-events-none transform rotate-12">
+                   <ArrowDown className="w-32 h-32" />
+                </div>
+                <div className="relative z-10">
+                     <div className="flex items-center space-x-2 mb-3">
+                        <span className="bg-orange-200 text-orange-800 p-1.5 rounded-lg"><ArrowDown size={20}/></span>
+                        <h3 className="text-lg font-bold text-orange-900">{t.descName}</h3>
+                    </div>
+                    <div className="mb-3">
+                         <IntervalExampleVisual type="desc" isPlaying={playingTypeExample === 'desc'} />
+                    </div>
+                    <p className="text-orange-800 mb-4 text-sm leading-tight min-h-[40px]">
+                        {t.descDef}
+                    </p>
+                    <button 
+                        onClick={() => playTypeExample('desc')}
+                        className="w-full bg-white hover:bg-orange-100 text-orange-700 font-semibold py-2 rounded-lg border border-orange-200 flex items-center justify-center space-x-2 transition-colors shadow-sm text-sm"
+                    >
+                        <Volume2 size={18} />
+                        <span>{t.listen}</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Tarjeta Armónico */}
+            <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden h-fit">
+                <div className="absolute -bottom-4 -right-4 text-violet-200 opacity-20 pointer-events-none transform rotate-0">
+                   <Activity className="w-32 h-32" />
+                </div>
+                <div className="relative z-10">
+                    <div className="flex items-center space-x-2 mb-3">
+                        <span className="bg-violet-200 text-violet-800 p-1.5 rounded-lg"><Activity size={20}/></span>
+                        <h3 className="text-lg font-bold text-violet-900">{t.harmName}</h3>
+                    </div>
+                    <div className="mb-3">
+                         <IntervalExampleVisual type="harm" isPlaying={playingTypeExample === 'harm'} />
+                    </div>
+                    <p className="text-violet-800 mb-4 text-sm leading-tight min-h-[40px]">
+                        {t.harmDef}
+                    </p>
+                    <button 
+                        onClick={() => playTypeExample('harm')}
+                        className="w-full bg-white hover:bg-violet-100 text-violet-700 font-semibold py-2 rounded-lg border border-violet-200 flex items-center justify-center space-x-2 transition-colors shadow-sm text-sm"
+                    >
+                        <Volume2 size={18} />
+                        <span>{t.listen}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+      </div>
+  );
+
+  const LearnView = () => (
+    <div className="p-6 max-w-6xl mx-auto pb-24 overflow-y-auto h-full">
+       <div className="flex items-center justify-between mb-8">
+        <h2 className="text-3xl font-bold text-gray-800 flex items-center">
+            <BookOpen className="mr-3 text-indigo-600" />
+            {t.learnTitle}
+        </h2>
+        <button onClick={() => setView('home')} className="text-gray-500 hover:text-indigo-600 underline">
+            {t.back}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {INTERVALS.map((inv, idx) => {
+            const theme = inv.colorTheme;
+            const cardClass = `p-5 rounded-xl shadow-sm border hover:shadow-md transition-all bg-${theme}-50 border-${theme}-200 relative overflow-hidden`;
+            const badgeClass = `text-[10px] font-bold px-2 py-1 rounded-md border bg-white/60 text-${theme}-700 border-${theme}-200 relative z-10`;
+            const btnClass = `w-full flex items-center justify-center space-x-2 py-2 rounded-lg border transition-colors bg-white hover:bg-white/80 text-${theme}-700 border-${theme}-200 mt-auto shadow-sm relative z-10`;
+            
+            let WatermarkIcon = BeamedNotes;
+            if (idx % 4 === 0) WatermarkIcon = TrebleClef;
+            else if (idx % 4 === 1) WatermarkIcon = BassClef;
+            else if (idx % 4 === 2) WatermarkIcon = QuarterNote;
+
+            return (
+            <div key={idx} className={cardClass}>
+                <div className={`absolute -bottom-4 -right-4 text-${theme}-200 opacity-20 pointer-events-none transform rotate-12`}>
+                   <WatermarkIcon className="w-24 h-24" />
+                </div>
+
+                <div className="flex justify-between items-start mb-2 relative z-10">
+                    <span className={`text-xs font-bold px-2 py-1 rounded-md bg-${theme}-100 text-${theme}-800`}>
+                        {inv.short}
+                    </span>
+                    <span className={badgeClass}>
+                      {inv.semitones} {t.semitones} | {inv.tones} {t.tones}
+                    </span>
+                </div>
+                
+                <h3 className={`font-bold text-lg text-gray-800 mb-1 leading-tight relative z-10`}>{inv.name[lang]}</h3>
+                <p className="text-sm text-gray-600 mb-2 italic h-10 leading-snug relative z-10">{inv.desc[lang]}</p>
+                
+                <div className="bg-white/50 rounded-lg p-3 my-3 border border-white/60 backdrop-blur-sm relative z-10">
+                    <div className="flex items-center space-x-2 text-sm text-gray-700 mb-2">
+                        <ArrowUp size={16} className={`text-${theme}-600 flex-shrink-0`} />
+                        <span className="truncate text-xs font-medium" title={inv.songs.asc[lang]}>{inv.songs.asc[lang]}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-gray-700">
+                        <ArrowDown size={16} className={`text-${theme}-600 flex-shrink-0 opacity-70`} />
+                        <span className="truncate text-xs font-medium" title={inv.songs.desc[lang]}>{inv.songs.desc[lang]}</span>
+                    </div>
+                </div>
+
+                <button 
+                    onClick={() => playInterval(BASE_FREQ, inv.semitones)}
+                    className={btnClass}
+                >
+                    <Volume2 size={16} />
+                    <span>{t.listen}</span>
+                </button>
+            </div>
+            );
+        })}
+      </div>
+    </div>
+  );
+
+  const TrainView = () => {
+    const options = selectedDifficulty === 'easy' 
+        ? INTERVALS.filter(i => [0, 4, 5, 7, 12].includes(i.semitones)) 
+        : INTERVALS;
+    
+    return (
+    <div className="flex flex-col h-full items-center p-4 relative overflow-hidden">
+        
+        <div className="absolute inset-0 pointer-events-none opacity-5">
+             <TrebleClef className="absolute top-[10%] left-[5%] w-48 h-48 text-indigo-500 animate-pulse" style={{animationDuration: '5s'}}/>
+             <BassClef className="absolute bottom-[10%] right-[5%] w-48 h-48 text-indigo-500 animate-pulse" style={{animationDuration: '7s'}}/>
+             <BeamedNotes className="absolute top-[15%] right-[15%] w-24 h-24 text-indigo-400 transform rotate-12" />
+             <QuarterNote className="absolute bottom-[20%] left-[15%] w-20 h-20 text-indigo-400 transform -rotate-12" />
+             <StaffLines className="absolute top-1/2 left-0 w-full text-indigo-300 opacity-50" />
+        </div>
+
+        <div className="w-full max-w-4xl flex justify-between items-center mb-2 bg-white p-2 rounded-xl shadow-sm z-50 flex-shrink-0">
+            <button onClick={() => setView('home')} className="text-sm text-gray-500 hover:text-gray-800 font-medium">
+                ← {t.exit}
+            </button>
+            <div className="flex space-x-6 text-sm">
+                <div className="text-center">
+                    <span className="block text-gray-400 text-[10px] uppercase">{t.score}</span>
+                    <span className="font-bold text-green-600 text-lg">{score}</span>
+                </div>
+                <div className="text-center">
+                    <span className="block text-gray-400 text-[10px] uppercase">{t.attempts}</span>
+                    <span className="font-bold text-gray-700 text-lg">{attempts}</span>
+                </div>
+            </div>
+            <select 
+                value={selectedDifficulty}
+                onChange={(e) => { setSelectedDifficulty(e.target.value); setScore(0); setAttempts(0); setCurrentQuestion(null); }}
+                className="bg-gray-100 border-none text-xs rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+            >
+                <option value="easy">{t.levelBasic}</option>
+                <option value="hard">{t.levelChromatic}</option>
+            </select>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center w-full max-w-4xl relative">
+            
+            <div className="absolute top-4 left-0 right-0 text-center pointer-events-none z-20">
+                 {!currentQuestion ? (
+                    <div className="inline-block bg-indigo-600 text-white px-6 py-2 rounded-full shadow-lg animate-bounce">
+                        <span className="font-bold text-sm">¡Pulsa el botón central para comenzar!</span>
+                    </div>
+                ) : feedback === 'correct' ? (
+                    <div className="inline-block bg-green-500 text-white px-6 py-2 rounded-full shadow-xl animate-bounce">
+                         <div className="flex items-center space-x-2">
+                            <Sparkles size={16} className="text-yellow-300" />
+                            <span className="font-bold text-base">{t.correct}</span>
+                            <span className="bg-white/20 px-2 rounded-md text-xs">{currentQuestion.interval.name[lang]}</span>
+                        </div>
+                    </div>
+                ) : feedback === 'incorrect' ? (
+                     <div className="inline-block bg-red-500 text-white px-6 py-2 rounded-full shadow-lg animate-shake">
+                        <span className="font-bold">{t.incorrect}</span>
+                    </div>
+                ) : (
+                    <div className="text-gray-400 font-medium text-sm bg-white/80 inline-block px-4 py-1 rounded-full backdrop-blur-sm">
+                        {t.listenPrompt}
+                    </div>
+                )}
+            </div>
+
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
+                <button 
+                    onClick={() => currentQuestion ? playInterval(currentQuestion.baseFreq, currentQuestion.interval.semitones, 'melodic', currentQuestion.direction) : generateQuestion()}
+                    className={`
+                        w-24 h-24 md:w-28 md:h-28 rounded-full shadow-2xl flex flex-col items-center justify-center transition-all duration-300 border-4
+                        ${isPlaying ? 'scale-110 border-indigo-300 shadow-indigo-500/50' : 'hover:scale-105 border-white'}
+                        ${!currentQuestion ? 'bg-gradient-to-br from-indigo-500 to-violet-600 text-white' : 'bg-white text-indigo-600'}
+                    `}
+                >
+                    {isPlaying && (
+                        <>
+                            <div className="absolute inset-0 rounded-full border-4 border-indigo-400 opacity-50 animate-ping"></div>
+                            <div className="absolute -inset-4 rounded-full border border-indigo-200 opacity-30 animate-pulse"></div>
+                        </>
+                    )}
+
+                    {!currentQuestion ? (
+                        <>
+                            <Play size={32} fill="currentColor" className="ml-1" />
+                            <span className="text-[10px] font-bold mt-1 uppercase tracking-wider">Start</span>
+                        </>
+                    ) : feedback === 'correct' ? (
+                        <div onClick={(e) => { e.stopPropagation(); generateQuestion(); }} className="flex flex-col items-center cursor-pointer w-full h-full justify-center bg-green-50 rounded-full text-green-600 hover:bg-green-100">
+                             <RefreshCw size={28} className={isPlaying ? "animate-spin" : ""} />
+                             <span className="text-[10px] font-bold mt-1">{t.next}</span>
+                        </div>
+                    ) : (
+                        <>
+                            <Volume2 size={32} className={isPlaying ? "animate-pulse" : ""} />
+                            <span className="text-[10px] font-bold mt-1 uppercase">{isPlaying ? '...' : t.touchToRepeat}</span>
+                        </>
+                    )}
+                </button>
+            </div>
+
+            {currentQuestion && feedback !== 'correct' && (
+                <div className="relative w-full h-full animate-fade-in flex items-center justify-center">
+                    {options.map((inv, index) => {
+                        const total = options.length;
+                        const angle = (2 * Math.PI / total) * index - (Math.PI / 2); 
+                        // Radio ajustado para pantallas medianas/escritorio
+                        const x = Math.cos(angle) * (window.innerHeight < 700 ? 140 : 200); 
+                        const y = Math.sin(angle) * (window.innerHeight < 700 ? 140 : 200);
+                        
+                        const theme = inv.colorTheme;
+                        
+                        return (
+                            <button
+                                key={index}
+                                onClick={() => handleGuess(inv)}
+                                style={{
+                                    position: 'absolute',
+                                    left: '50%',
+                                    top: '50%',
+                                    transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
+                                }}
+                                className={`
+                                    w-20 h-20 md:w-24 md:h-24 rounded-full shadow-md flex flex-col items-center justify-center transition-all duration-200
+                                    bg-${theme}-100 border-2 border-${theme}-200 text-${theme}-800
+                                    hover:scale-110 hover:shadow-xl hover:bg-${theme}-200 hover:border-${theme}-400 hover:z-50
+                                    px-2 z-40
+                                `}
+                            >
+                                <span className="font-bold text-[10px] md:text-xs text-center leading-tight">
+                                    {inv.name[lang]}
+                                </span>
+                                <span className="text-[10px] opacity-80 leading-none mt-1 font-mono font-bold">
+                                    {inv.semitones} {t.semitones}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    </div>
+    );
+  };
+
+  return (
+    <div className="h-screen flex flex-col bg-gradient-to-br from-gray-50 to-indigo-50 font-sans text-gray-900 selection:bg-indigo-100 overflow-hidden">
+      <nav className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center z-50 flex-shrink-0 h-[60px]">
+        <div className="flex items-center space-x-2 cursor-pointer" onClick={() => setView('home')}>
+            <div className="bg-indigo-600 rounded-lg p-1">
+                <Music size={18} className="text-white" />
+            </div>
+            <span className="font-bold text-lg tracking-tight text-gray-800 hidden md:block">{t.title}</span>
+        </div>
+        <div className="flex items-center space-x-4">
+            <div className="text-xs text-gray-500 font-mono hidden md:block">
+                C.I.E.D.I. | Dept. Artes
+            </div>
+        </div>
+      </nav>
+
+      <main className="flex-1 overflow-hidden relative">
+        {view === 'home' && <HomeView />}
+        {view === 'learn' && <LearnView />}
+        {view === 'train' && <TrainView />}
+        {view === 'types' && <TypesView />}
+      </main>
+
+      <style>{`
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
+    </div>
+  );
+}
