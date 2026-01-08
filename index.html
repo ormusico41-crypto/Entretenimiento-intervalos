@@ -11,7 +11,6 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <style>
-        /* Animaciones personalizadas */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
@@ -20,8 +19,6 @@
         .animate-shake { animation: shake 0.3s ease-in-out; }
         .animate-fade-in { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        /* Prevenir selección de texto en botones para sensación de App nativa */
         button { user-select: none; -webkit-tap-highlight-color: transparent; }
         body { overscroll-behavior-y: none; }
     </style>
@@ -34,7 +31,7 @@
         // --- CONFIGURACIÓN REACT ---
         const { useState, useEffect, useMemo } = React;
 
-        // --- ICONOS (Recreados para no depender de librerías externas) ---
+        // --- ICONOS ---
         const IconBase = ({ d, className, size = 24 }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
                 {d}
@@ -55,7 +52,7 @@
         const Layers = (p) => <IconBase {...p} d={<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>} />;
         const Activity = (p) => <IconBase {...p} d={<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>} />;
 
-        // --- ICONOS MUSICALES ESPECIALES ---
+        // --- ICONOS MUSICALES ---
         const TrebleClef = ({ className }) => (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
             <path d="M9 18V5l12-2v13" style={{opacity: 0}} />
@@ -96,7 +93,6 @@
         );
 
         // --- COMPONENTES AUXILIARES ---
-
         const IntervalExampleVisual = ({ type, isPlaying }) => {
         return (
             <div className="relative w-full h-20 bg-white rounded-lg border border-gray-100 flex items-center justify-center overflow-hidden">
@@ -143,8 +139,7 @@
         );
         };
 
-        // --- DATOS Y TRADUCCIONES ---
-
+        // --- DATOS ---
         const TRANSLATIONS = {
         es: {
             title: 'Intervalos',
@@ -316,6 +311,7 @@
 
         const BASE_FREQ = 261.63; 
 
+        // --- APLICACIÓN PRINCIPAL (SIN EXPORT DEFAULT) ---
         function App() {
             const [view, setView] = useState('home'); 
             const [lang, setLang] = useState('es'); 
@@ -534,7 +530,6 @@
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 items-center">
-                        {/* Tarjeta Ascendente */}
                         <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden h-fit">
                             <div className="absolute -bottom-4 -right-4 text-sky-200 opacity-20 pointer-events-none transform -rotate-12">
                                 <ArrowUp size={128} />
@@ -560,7 +555,6 @@
                             </div>
                         </div>
 
-                        {/* Tarjeta Descendente */}
                         <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden h-fit">
                             <div className="absolute -bottom-4 -right-4 text-orange-200 opacity-20 pointer-events-none transform rotate-12">
                                 <ArrowDown size={128} />
@@ -586,7 +580,6 @@
                             </div>
                         </div>
 
-                        {/* Tarjeta Armónico */}
                         <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden h-fit">
                             <div className="absolute -bottom-4 -right-4 text-violet-200 opacity-20 pointer-events-none transform rotate-0">
                                 <Activity size={128} />
@@ -630,8 +623,6 @@
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {INTERVALS.map((inv, idx) => {
                         const theme = inv.colorTheme;
-                        // Tailwind dinámico requiere nombres completos en el código fuente para purga, 
-                        // pero con CDN funciona si construimos la cadena.
                         const cardClass = `p-5 rounded-xl shadow-sm border hover:shadow-md transition-all bg-${theme}-50 border-${theme}-200 relative overflow-hidden`;
                         const badgeClass = `text-[10px] font-bold px-2 py-1 rounded-md border bg-white/60 text-${theme}-700 border-${theme}-200 relative z-10`;
                         const btnClass = `w-full flex items-center justify-center space-x-2 py-2 rounded-lg border transition-colors bg-white hover:bg-white/80 text-${theme}-700 border-${theme}-200 mt-auto shadow-sm relative z-10`;
